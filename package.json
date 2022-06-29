@@ -1,0 +1,40 @@
+{
+  "name": "cognito-jwt-lite",
+  "version": "1.0.0-rc.0",
+  "description": "Lightweight AWS Cognito JWT verifier",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "npx jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarioArnt/cognito-jwt-lite.git"
+  },
+  "keywords": [
+    "aws",
+    "cognito",
+    "jwt",
+    "lightweight",
+    "verify",
+    "typescript"
+  ],
+  "author": "Mario Arnautou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MarioArnt/cognito-jwt-lite/issues"
+  },
+  "homepage": "https://github.com/MarioArnt/cognito-jwt-lite#readme",
+  "devDependencies": {
+    "@types/jest": "^28.1.3",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/jwk-to-pem": "^2.0.1",
+    "@types/node": "^18.0.0",
+    "jest": "^28.1.2",
+    "ts-jest": "^28.0.5",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "jwk-to-pem": "^2.0.5"
+  }
+}
