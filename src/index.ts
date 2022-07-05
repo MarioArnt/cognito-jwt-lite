@@ -16,9 +16,11 @@ type ErrorCode =
   | 'MissingKeyID'
   | 'ErrorFetchingKeys'
   | 'InvalidDiscoveryResponse'
+  | 'InvalidIssuer'
+  | 'CannotConvertFromJwkToPem'
   | 'JsonWebTokenError';
 
-class JwtError extends Error {
+export class JwtError extends Error {
   code: ErrorCode;
   details: Error;
   constructor(code: ErrorCode, msg: string, details?: Error) {
@@ -45,7 +47,7 @@ const invalidPayloadError = (discoveryURL: string) =>
   new JwtError('InvalidDiscoveryResponse', `API call to discovery URL ${discoveryURL} returned an invalid response`);
 
 const throwError = (err: Error): Error => {
-  return new JwtError('ErrorFetchingKeys', 'An error occurred retrieving public keys from Microsoft API', err);
+  return new JwtError('ErrorFetchingKeys', 'An error occurred retrieving public keys from Cognito API', err);
 };
 
 /**
@@ -117,9 +119,13 @@ const buildKey = async (options: IDecodeOptions, kid: string) => {
   const keys = await getKeys(options);
   const matchingKey = keys.find((k) => k.kid === kid);
   if (!matchingKey) {
-    throw new JwtError('NotMatchingKey', 'A key matching your token kid cannot  be found in Microsoft public keys');
+    throw new JwtError('NotMatchingKey', 'A key matching your token kid cannot  be found in Cognito public keys');
   }
-  return convertToPem(matchingKey);
+  try {
+    return convertToPem(matchingKey);
+  } catch (e) {
+    throw new JwtError('CannotConvertFromJwkToPem', 'Failed to convert matching JWK to PEM');
+  }
 };
 
 const verifyJWT = async (token: string, key: string, options: IDecodeOptions): Promise<unknown> => {
@@ -138,9 +144,16 @@ const verifyJWT = async (token: string, key: string, options: IDecodeOptions): P
   });
 };
 
+const isIssuerValid = (issuer: string) => {
+  return issuer.match(/https:\/\/cognito-idp.[a-z1-9-]+.amazonaws.com\/.+\/?/);
+}
+
 export const verify = async (token: string, options: IDecodeOptions): Promise<unknown> => {
   if (!token || typeof token !== 'string') {
     throw new JwtError('InvalidToken', 'Token provided must be a non-empty string');
+  }
+  if (!isIssuerValid(options.issuer)) {
+    throw new JwtError('InvalidIssuer', 'Issuer must match https:\\/\\/cognito-idp.[a-z1-9-]+.amazonaws.com\\/.+\\/?');
   }
   const decoded = decode(token, { complete: true });
   if (!decoded) {
