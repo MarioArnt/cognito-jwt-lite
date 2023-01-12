@@ -36,7 +36,7 @@ In your authentication middleware decode and verify the token using:
 ```typescript
 import { verify } from 'cognito-jwt-lite';
 
-const decoded = await verifyAzureToken(token, {
+const decoded = await verify(token, {
   issuer: `https://cognito-idp.${process.env.AWS_COGNITO_POOL_REGION}.amazonaws.com/${process.env.AWS_COGNITO_POOL_ID}`,
 });
 ```
@@ -46,7 +46,7 @@ You can add any option supported by [jsonwebtoken](https://www.npmjs.com/package
 ```typescript
 import { verify } from 'cognito-jwt-lite';
 
-const decoded = await verifyAzureToken(token, {
+const decoded = await verify(token, {
   audience: process.env.JWT_AUD,
   issuer: `https://cognito-idp.${process.env.AWS_COGNITO_POOL_REGION}.amazonaws.com/${process.env.AWS_COGNITO_POOL_ID}`,
 });
@@ -57,9 +57,9 @@ const decoded = await verifyAzureToken(token, {
 * Retries on 5xx: set the number of retries when request to fetch keys returns a 5xx response (defaults to 2)
 
 ```typescript
-import { verifyAzureToken } from 'cognito-jwt-lite';
+import { verify } from 'cognito-jwt-lite';
 
-const decoded = await verifyAzureToken(token, {
+const decoded = await verify(token, {
   maxRetries: 5,
   audience: process.env.JWT_AUD,
   issuer: process.env.JWT_ISS,
@@ -73,7 +73,7 @@ The lib will throw the following errors if something wrong happends during decod
  * `InvalidToken`: the token provided is not a non-empty string.
  * `InvalidIssuer`: the issuer does not match the pattern `https://cognito-idp.<aws-region>.amazonaws.com/<pool-id>`
  * `TokenNotDecoded`: the token cannot be decoded. This usually means the token is ill-formed.
- * `MissingKeyID`: no `kid` (Microsoft Key ID) field is present in JWT header.
- * `ErrorFetchingKeys`: API call to fetch Microsoft public keys failed.
- * `NotMatchingKey`: no matching key is found in Microsoft response.
+ * `MissingKeyID`: no `kid` (Key ID) field is present in JWT header.
+ * `ErrorFetchingKeys`: API call to fetch Cognito public keys failed.
+ * `NotMatchingKey`: no matching key is found in Cognito response.
  * `JsonWebTokenError`: token cannot be verified, the human-readable reason is provided (expired, audience mismatch etc...)
