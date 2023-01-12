@@ -144,8 +144,8 @@ const verifyJWT = async (token: string, key: string, options: IDecodeOptions): P
   });
 };
 
-const isIssuerValid = (issuer: string) => {
-  return issuer.match(/https:\/\/cognito-idp.[a-z1-9-]+.amazonaws.com\/.+\/?/);
+const isIssuerValid = (issuer?: string) => {
+  return issuer?.match(/https:\/\/cognito-idp.[a-z1-9-]+.amazonaws.com\/.+\/?/);
 };
 
 export const verify = async (token: string, options: IDecodeOptions): Promise<unknown> => {
