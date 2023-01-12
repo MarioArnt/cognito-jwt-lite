@@ -1,10 +1,13 @@
 # cognito-jwt-lite
 
+![npm](https://img.shields.io/npm/v/cognito-jwt-lite)
 ![npm bundle size](https://img.shields.io/bundlephobia/minzip/cognito-jwt-lite)
 ![npm](https://img.shields.io/npm/dm/cognito-jwt-lite)
-![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/MarioArnt/cognito-jwt-lite)
+[![semantic-release](https://img.shields.io/badge/semantic--release-enabled?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/MarioArnt/cognito-jwt-lite/publish.yml)
+![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/MarioArnt/cognito-jwt-lite)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=MarioArnt_cognito-jwt-lite&metric=coverage)](https://sonarcloud.io/dashboard?id=MarioArnt_cognito-jwt-lite)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=MarioArnt_cognito-jwt-lite&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=MarioArnt_cognito-jwt-lite)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=MarioArnt_cognito-jwt-lite&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=MarioArnt_cognito-jwt-lite)
