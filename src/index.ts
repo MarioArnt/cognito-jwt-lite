@@ -1,7 +1,7 @@
 import { decode, verify as jwtVerify, VerifyOptions } from 'jsonwebtoken';
 import convertToPem from 'jwk-to-pem';
-import {get} from "https";
-import {IncomingMessage} from "http";
+import { get } from 'https';
+import { IncomingMessage } from 'http';
 export interface IDecodeOptions extends VerifyOptions {
   issuer: string;
   maxRetries?: number;
@@ -146,7 +146,7 @@ const verifyJWT = async (token: string, key: string, options: IDecodeOptions): P
 
 const isIssuerValid = (issuer: string) => {
   return issuer.match(/https:\/\/cognito-idp.[a-z1-9-]+.amazonaws.com\/.+\/?/);
-}
+};
 
 export const verify = async (token: string, options: IDecodeOptions): Promise<unknown> => {
   if (!token || typeof token !== 'string') {
