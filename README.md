@@ -1,7 +1,7 @@
 # cognito-jwt-lite
 
-![npm](https://img.shields.io/npm/v/cognito-jwt-lite)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/cognito-jwt-lite)
+[![npm](https://img.shields.io/npm/v/cognito-jwt-lite)](https://www.npmjs.com/package/cognito-jwt-lite)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/cognito-jwt-lite)](https://bundlephobia.com/package/cognito-jwt-lite)
 ![npm](https://img.shields.io/npm/dm/cognito-jwt-lite)
 [![semantic-release](https://img.shields.io/badge/semantic--release-enabled?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
