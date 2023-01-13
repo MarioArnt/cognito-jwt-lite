@@ -25,6 +25,8 @@ Lightweight library to verify AWS Cognito JSON Web Tokens.
 
 This package is implemented in typescript and provide its own type definitions.
 
+> Need lightweight lib to verify Azure AD tokens ? [Check this out](https://github.com/MarioArnt/azure-ad-jwt-lite)
+
 ## Getting started
 
 Install the package using yarn or NPM: `npm i cognito-jwt-lite`
