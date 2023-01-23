@@ -2,7 +2,7 @@
   "name": "cognito-jwt-lite",
   "version": "0.0.0-development",
   "description": "Lightweight AWS Cognito JWT verifier",
-  "main": "lib/index.js",
+  "main": "lib/src/index.js",
   "scripts": {
     "prettier": "npx prettier --write '{src,test}/**/*.{ts,tsx,json,yml}'",
     "lint": "npx eslint '{src,test}/**/*.{ts,tsx,json,yml}'",
