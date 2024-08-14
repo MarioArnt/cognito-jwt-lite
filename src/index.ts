@@ -1,6 +1,7 @@
 import { decode, verify as jwtVerify, VerifyOptions } from 'jsonwebtoken';
-import convertToPem from 'jwk-to-pem';
 import { get } from 'https';
+import { exportSPKI, importJWK } from 'jose';
+import type { JWK, KeyLike } from 'jose';
 import { IncomingMessage } from 'http';
 export interface IDecodeOptions extends VerifyOptions {
   issuer: string;
@@ -30,15 +31,6 @@ export class JwtError extends Error {
   }
 }
 
-interface IKey {
-  alg: string;
-  e: string;
-  kid: string;
-  kty: 'RSA';
-  n: string;
-  use: string;
-}
-
 const getDiscoveryUrl = (issuer: string): string => {
   return `${issuer}/.well-known/jwks.json`;
 };
@@ -53,7 +45,7 @@ const throwError = (err: Error): Error => {
 /**
  * Retry request on network failure or on 5xx
  */
-const retry = (err: Error, attempt: number, retries: number, options: IDecodeOptions): Promise<Array<IKey>> => {
+const retry = (err: Error, attempt: number, retries: number, options: IDecodeOptions): Promise<Array<JWK>> => {
   return new Promise((resolve, reject) => {
     if (attempt >= retries) {
       return reject(throwError(err));
@@ -67,8 +59,8 @@ const retry = (err: Error, attempt: number, retries: number, options: IDecodeOpt
 /**
  * Verify that payload response is on the expected format
  */
-const verifyResponse = (data: string): IKey[] => {
-  const validated = JSON.parse(data) as { keys: IKey[] };
+const verifyResponse = (data: string): JWK[] => {
+  const validated = JSON.parse(data) as { keys: JWK[] };
   if (validated.keys && Array.isArray(validated.keys) && validated.keys.every((key) => key.kid != null)) {
     return validated.keys;
   }
@@ -82,7 +74,7 @@ const onResponse = (
   retries: number,
   options: IDecodeOptions,
   url: string,
-): Promise<Array<IKey>> => {
+): Promise<Array<JWK>> => {
   return new Promise((resolve, reject) => {
     if (response.statusCode !== 200) {
       const error = new Error(`Server answered with status code ${response.statusCode}`);
@@ -101,7 +93,7 @@ const onResponse = (
   });
 };
 
-const getKeys = async (options: IDecodeOptions, attempt = 0): Promise<Array<IKey>> => {
+const getKeys = async (options: IDecodeOptions, attempt = 0): Promise<Array<JWK>> => {
   const discoveryURL = getDiscoveryUrl(options.issuer);
   const retries = options && options.maxRetries != null ? options.maxRetries : DEFAULT_DISCOVERY_RETRIES;
   return new Promise((resolve, reject) => {
@@ -122,7 +114,8 @@ const buildKey = async (options: IDecodeOptions, kid: string) => {
     throw new JwtError('NotMatchingKey', 'A key matching your token kid cannot  be found in Cognito public keys');
   }
   try {
-    return convertToPem(matchingKey);
+    const publicKey = await importJWK(matchingKey);
+    return exportSPKI(publicKey as KeyLike);
   } catch (e) {
     throw new JwtError('CannotConvertFromJwkToPem', 'Failed to convert matching JWK to PEM');
   }

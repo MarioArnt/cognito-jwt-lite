@@ -1,10 +1,11 @@
 import { JwtError, verify } from '../src';
 import jwt from 'jsonwebtoken';
-import * as convertToPem from 'jwk-to-pem';
+import * as jose from 'jose';
 import nock from 'nock';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 jest.mock('jsonwebtoken');
-jest.mock('jwk-to-pem');
 
 const mocks = {
   token: '$token',
@@ -18,7 +19,7 @@ describe('The token verifier method', () => {
   let pem: jest.SpyInstance;
   beforeEach(() => {
     decode = jest.spyOn(jwt, 'decode');
-    pem = jest.spyOn(convertToPem, 'default');
+    pem = jest.spyOn(jose, 'importJWK');
     jwtVerify = jest.spyOn(jwt, 'verify');
   });
   afterEach(() => {
@@ -54,6 +55,17 @@ describe('The token verifier method', () => {
       fail('should fail');
     } catch (e) {
       expect((e as JwtError).code).toBe('TokenNotDecoded');
+    }
+  });
+  it('should throw InvalidIssuer if issuer is undefined', async () => {
+    decode.mockImplementation(() => ({ header: { kid: undefined } }));
+    try {
+      await verify('$token', {
+        issuer: undefined,
+      });
+      fail('should fail');
+    } catch (e) {
+      expect((e as JwtError).code).toBe('InvalidIssuer');
     }
   });
   it('should throw InvalidIssuer if issuer is invalid', async () => {
@@ -194,11 +206,9 @@ describe('The token verifier method', () => {
     }
   });
   it('should throw JsonWebTokenError if token validation fails', async () => {
-    nock(mocks.issuer)
-      .get('/.well-known/jwks.json')
-      .reply(200, JSON.stringify({ keys: [{ kid: mocks.kid }] }));
-    decode.mockImplementation(() => ({ header: { kid: mocks.kid } }));
-    pem.mockImplementation(() => ({ fake: 'key' }));
+    const { keys } = JSON.parse(readFileSync(join(__dirname, 'jwks.json')).toString());
+    nock(mocks.issuer).get('/.well-known/jwks.json').reply(200, JSON.stringify({ keys }));
+    decode.mockImplementation(() => ({ header: { kid: keys[0].kid } }));
     jwtVerify.mockImplementation((_token, _key, _options, callback) => {
       callback('Invalid token', null);
     });
@@ -212,20 +222,18 @@ describe('The token verifier method', () => {
       expect(decode).toHaveBeenCalledTimes(1);
       expect(pem).toHaveBeenCalledTimes(1);
       expect(decode).toHaveBeenCalledWith('$token', { complete: true });
-      expect(pem).toHaveBeenCalledWith({ kid: mocks.kid });
+      expect(pem).toHaveBeenCalledWith(keys[0]);
       expect(jwtVerify).toHaveBeenCalledTimes(1);
       expect(jwtVerify.mock.calls[0][0]).toBe('$token');
-      expect(jwtVerify.mock.calls[0][1]).toEqual({ fake: 'key' });
+      expect(jwtVerify.mock.calls[0][1].startsWith('-----BEGIN PUBLIC KEY-----')).toBe(true);
       expect(jwtVerify.mock.calls[0][2]).toEqual({ issuer: 'https://cognito-idp.region.amazonaws.com/poolId' });
       expect((e as JwtError).code).toBe('JsonWebTokenError');
     }
   });
   it('should verify the token and return the payload otherwise (no retry)', async () => {
-    nock(mocks.issuer)
-      .get('/.well-known/jwks.json')
-      .reply(200, JSON.stringify({ keys: [{ kid: mocks.kid }] }));
-    decode.mockImplementation(() => ({ header: { kid: mocks.kid } }));
-    pem.mockImplementation(() => ({ fake: 'key' }));
+    const { keys } = JSON.parse(readFileSync(join(__dirname, 'jwks.json')).toString());
+    nock(mocks.issuer).get('/.well-known/jwks.json').reply(200, JSON.stringify({ keys }));
+    decode.mockImplementation(() => ({ header: { kid: keys[0].kid } }));
     jwtVerify.mockImplementation((_token, _key, _options, callback) => {
       callback(null, { principalId: 'John Doe' });
     });
@@ -237,21 +245,19 @@ describe('The token verifier method', () => {
     expect(decode).toHaveBeenCalledTimes(1);
     expect(pem).toHaveBeenCalledTimes(1);
     expect(decode).toHaveBeenCalledWith('$token', { complete: true });
-    expect(pem).toHaveBeenCalledWith({ kid: mocks.kid });
+    expect(pem).toHaveBeenCalledWith(keys[0]);
     expect(jwtVerify).toHaveBeenCalledTimes(1);
     expect(jwtVerify.mock.calls[0][0]).toBe('$token');
-    expect(jwtVerify.mock.calls[0][1]).toEqual({ fake: 'key' });
+    expect(jwtVerify.mock.calls[0][1].startsWith('-----BEGIN PUBLIC KEY-----')).toBe(true);
     expect(jwtVerify.mock.calls[0][2]).toEqual({ issuer: 'https://cognito-idp.region.amazonaws.com/poolId' });
   });
   it('should verify the token and return the payload otherwise (with retries)', async () => {
+    const { keys } = JSON.parse(readFileSync(join(__dirname, 'jwks.json')).toString());
     nock(mocks.issuer).get('/.well-known/jwks.json').reply(502, 'Bad Gateway');
     nock(mocks.issuer).get('/.well-known/jwks.json').reply(502, 'Bad Gateway');
     nock(mocks.issuer).get('/.well-known/jwks.json').reply(502, 'Bad Gateway');
-    nock(mocks.issuer)
-      .get('/.well-known/jwks.json')
-      .reply(200, JSON.stringify({ keys: [{ kid: mocks.kid }] }));
-    decode.mockImplementation(() => ({ header: { kid: mocks.kid } }));
-    pem.mockImplementation(() => ({ fake: 'key' }));
+    nock(mocks.issuer).get('/.well-known/jwks.json').reply(200, JSON.stringify({ keys }));
+    decode.mockImplementation(() => ({ header: { kid: keys[0].kid } }));
     jwtVerify.mockImplementation((_token, _key, _options, callback) => {
       callback(null, { principalId: 'John Doe' });
     });
@@ -263,10 +269,10 @@ describe('The token verifier method', () => {
     expect(decode).toHaveBeenCalledTimes(1);
     expect(pem).toHaveBeenCalledTimes(1);
     expect(decode).toHaveBeenCalledWith('$token', { complete: true });
-    expect(pem).toHaveBeenCalledWith({ kid: mocks.kid });
+    expect(pem).toHaveBeenCalledWith(keys[0]);
     expect(jwtVerify).toHaveBeenCalledTimes(1);
     expect(jwtVerify.mock.calls[0][0]).toBe('$token');
-    expect(jwtVerify.mock.calls[0][1]).toEqual({ fake: 'key' });
+    expect(jwtVerify.mock.calls[0][1].startsWith('-----BEGIN PUBLIC KEY-----')).toBe(true);
     expect(jwtVerify.mock.calls[0][2]).toEqual({ issuer: 'https://cognito-idp.region.amazonaws.com/poolId' });
   });
 });
