@@ -5,7 +5,7 @@
 ![npm](https://img.shields.io/npm/dm/cognito-jwt-lite)
 [![semantic-release](https://img.shields.io/badge/semantic--release-enabled?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
 
-
+<!--
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/MarioArnt/cognito-jwt-lite/publish.yml)
 ![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/MarioArnt/cognito-jwt-lite)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=MarioArnt_cognito-jwt-lite&metric=coverage)](https://sonarcloud.io/dashboard?id=MarioArnt_cognito-jwt-lite)
@@ -15,7 +15,7 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=MarioArnt_cognito-jwt-lite&metric=security_rating)](https://sonarcloud.io/dashboard?id=MarioArnt_cognito-jwt-lite)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=MarioArnt_cognito-jwt-lite&metric=sqale_index)](https://sonarcloud.io/dashboard?id=MarioArnt_cognito-jwt-lite)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=MarioArnt_cognito-jwt-lite&metric=bugs)](https://sonarcloud.io/dashboard?id=MarioArnt_cognito-jwt-lite)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=MarioArnt_cognito-jwt-lite&metric=code_smells)](https://sonarcloud.io/dashboard?id=MarioArnt_cognito-jwt-lite)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=MarioArnt_cognito-jwt-lite&metric=code_smells)](https://sonarcloud.io/dashboard?id=MarioArnt_cognito-jwt-lite)-->
 
 <p align="center">
   <img src="https://github.com/MarioArnt/cognito-jwt-lite/blob/main/logo.png?raw=true" alt="Logo"/>
